@@ -1,0 +1,38 @@
+public class MyStringRequest extends Request<String> { 
+Map<String, String> params; 
+private Response.Listener listener; 
+
+public MyStringRequest(int requestMethod, String url, Map<String, String> params, Response.Listener responseListener, Response.ErrorListener errorListener) { 
+super(requestMethod, url, errorListener); 
+this.params = params; 
+this.listener = responseListener; 
+} 
+
+@Override 
+protected void deliverResponse(String response) { 
+listener.onResponse(response); 
+} 
+
+@Override 
+public Map<String, String> getParams() {
+return params;
+}
+
+@Override
+public Map<String, String> getHeaders() { 
+Map<String,String> headers = new HashMap<String, String>(); 
+headers.put("Content-Type","application/x-www-form-urlencoded"); 
+headers.put("abc", "value");
+return headers; 
+}
+
+@Override
+protected Response parseNetworkResponse(NetworkResponse response) {
+try {
+String resp = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
+return Response.success(resp, HttpHeaderParser.parseCacheHeaders(response));
+} catch (Exception e) {
+return Response.error(new ParseError(e));
+}
+}
+}
